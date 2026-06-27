@@ -40,6 +40,10 @@ yarn-error.log*
 # local agent/session state
 .omc/
 
+# installed agent skills (tooling, not part of the app)
+.agents/
+skills-lock.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
