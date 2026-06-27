@@ -1,10 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="112" fill="#0b1020"/>
-  <circle cx="256" cy="256" r="150" fill="#f97316"/>
-  <g fill="#0b1020">
-    <rect x="196" y="156" width="16" height="200" rx="8"/>
-    <rect x="172" y="156" width="16" height="90" rx="8"/>
-    <rect x="220" y="156" width="16" height="90" rx="8"/>
-    <path d="M300 156c-22 0-36 26-36 70 0 30 12 46 28 50v80a8 8 0 0 0 16 0V156z"/>
+  <rect width="512" height="512" rx="116" fill="#1a0d11"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#d8b25a" stroke-width="6"/>
+  <g fill="#d8b25a" font-family="Georgia, 'Songti SC', serif" font-size="150" font-style="italic" text-anchor="middle">
+    <text x="256" y="308">食</text>
   </g>
 </svg>

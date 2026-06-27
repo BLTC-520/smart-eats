@@ -36,27 +36,27 @@ export function PlacePicker({ title, value, onChange, allowGps = true }: PlacePi
   }
 
   return (
-    <div className="rounded-2xl bg-white/5 p-3">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="text-sm text-slate-300">{title}</span>
-        {value ? (
-          <span className="max-w-[55%] truncate text-sm font-semibold text-orange-400">
-            {value.label}
-          </span>
-        ) : (
-          <span className="text-sm text-slate-500">未选</span>
-        )}
+    <div className="py-3">
+      <div className="flex items-baseline justify-between">
+        <span className="tracking-luxe text-[0.62rem] uppercase text-taupe">{title}</span>
+        <span
+          className={`max-w-[58%] truncate font-display text-base italic ${
+            value ? 'text-gold' : 'text-taupe/60'
+          }`}
+        >
+          {value ? value.label : '待选'}
+        </span>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
         {allowGps && (
           <button
             type="button"
             onClick={useMyLocation}
             disabled={locating}
-            className="min-h-9 rounded-full bg-orange-500/90 px-3 text-sm font-medium text-white disabled:opacity-60"
+            className="min-h-9 text-sm text-gold underline decoration-gold/40 underline-offset-4 disabled:opacity-60"
           >
-            {locating ? '定位中…' : '📍 用我的定位'}
+            {locating ? '定位中…' : '⌖ 我的定位'}
           </button>
         )}
         {KL_DISTRICTS.map((district) => {
@@ -66,8 +66,10 @@ export function PlacePicker({ title, value, onChange, allowGps = true }: PlacePi
               key={district.name}
               type="button"
               onClick={() => onChange({ label: district.name, center: district.center })}
-              className={`min-h-9 rounded-full px-3 text-sm transition-colors ${
-                active ? 'bg-white text-slate-900' : 'bg-white/10 text-slate-200'
+              className={`min-h-9 border-b text-sm transition-colors ${
+                active
+                  ? 'border-gold text-cream'
+                  : 'border-transparent text-taupe hover:text-cream/80'
               }`}
             >
               {district.name}
@@ -76,7 +78,7 @@ export function PlacePicker({ title, value, onChange, allowGps = true }: PlacePi
         })}
       </div>
 
-      {error && <p className="mt-2 text-xs text-rose-400">{error}</p>}
+      {error && <p className="mt-2 text-xs text-rose">{error}</p>}
     </div>
   )
 }

@@ -7,7 +7,7 @@ interface ResultCardProps {
   result: DecideResult
   rerolling?: boolean
   onReroll: () => void
-  onClose: () => void
+  onBack: () => void
 }
 
 function metricLine(result: DecideResult): string {
@@ -16,55 +16,48 @@ function metricLine(result: DecideResult): string {
   return `顺路只多绕 ${formatKm(result.detourKm)} · 全程约 ${formatMinutes(result.baseDurationMin)}`
 }
 
-export function ResultCard({ result, rerolling = false, onReroll, onClose }: ResultCardProps) {
+export function ResultCard({ result, rerolling = false, onReroll, onBack }: ResultCardProps) {
   const { restaurant } = result
 
   return (
-    <div className="w-full rounded-3xl bg-slate-900/80 p-5 shadow-2xl ring-1 ring-white/10 backdrop-blur">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-xs uppercase tracking-wide text-orange-400">今天就吃</p>
-          <h2 className="mt-1 truncate text-2xl font-bold text-white">{restaurant.name}</h2>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="关闭"
-          className="min-h-9 min-w-9 rounded-full bg-white/10 text-slate-300"
-        >
-          ✕
-        </button>
-      </div>
+    <div className="reveal flex flex-col">
+      <button
+        type="button"
+        onClick={onBack}
+        className="self-start text-sm text-taupe underline decoration-taupe/40 underline-offset-4 hover:text-cream"
+      >
+        ← 重新决定
+      </button>
 
-      {restaurant.cuisines.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {restaurant.cuisines.slice(0, 4).map((cuisine) => (
-            <span key={cuisine} className="rounded-full bg-white/10 px-2.5 py-1 text-xs text-slate-200">
-              {cuisine}
-            </span>
-          ))}
+      <p className="mt-8 tracking-luxe text-[0.62rem] uppercase text-gold-soft">今晚的选择</p>
+      <h2 className="mt-3 font-display text-[2.6rem] font-medium italic leading-[1.05] text-cream">
+        {restaurant.name}
+      </h2>
+
+      {(restaurant.cuisines.length > 0 || restaurant.openNow !== undefined) && (
+        <p className="mt-4 text-sm text-taupe">
+          {restaurant.cuisines.slice(0, 3).join(' · ')}
           {restaurant.openNow === true && (
-            <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs text-emerald-300">
-              营业中
-            </span>
+            <span className="text-gold-soft">{restaurant.cuisines.length ? ' · 此刻营业' : '此刻营业'}</span>
           )}
           {restaurant.openNow === false && (
-            <span className="rounded-full bg-rose-500/20 px-2.5 py-1 text-xs text-rose-300">
-              可能已打烊
-            </span>
+            <span className="text-rose">{restaurant.cuisines.length ? ' · 或已打烊' : '或已打烊'}</span>
           )}
-        </div>
+        </p>
       )}
 
-      <p className="mt-3 text-sm font-medium text-orange-300">{metricLine(result)}</p>
-      {restaurant.address && <p className="mt-1 text-sm text-slate-400">{restaurant.address}</p>}
+      <div className="rule-gold my-6" />
 
-      <div className="mt-5 flex gap-2">
+      <p className="font-serif text-lg text-gold">{metricLine(result)}</p>
+      {restaurant.address && <p className="mt-2 text-sm leading-relaxed text-taupe">{restaurant.address}</p>}
+
+      <div className="mt-8 flex items-center gap-5">
         <a
           href={mapsSearchUrl(restaurant.location)}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex min-h-12 flex-1 items-center justify-center rounded-2xl bg-orange-500 font-semibold text-white"
+          className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-gold font-serif text-base
+            font-[600] text-ink transition-[filter] hover:brightness-105"
         >
           在地图打开
         </a>
@@ -72,9 +65,10 @@ export function ResultCard({ result, rerolling = false, onReroll, onClose }: Res
           type="button"
           onClick={onReroll}
           disabled={rerolling}
-          className="flex min-h-12 flex-1 items-center justify-center rounded-2xl bg-white/10 font-semibold text-white disabled:opacity-60"
+          className={`min-h-12 text-base text-cream underline decoration-gold/50 underline-offset-4
+            disabled:opacity-60 ${rerolling ? 'shimmer' : ''}`}
         >
-          {rerolling ? '换…' : '换一个'}
+          {rerolling ? '换…' : '换一家'}
         </button>
       </div>
     </div>

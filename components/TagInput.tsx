@@ -29,11 +29,11 @@ export function TagInput({ label, hint, values, onChange, placeholder }: TagInpu
 
   return (
     <div>
-      <div className="mb-1 flex items-baseline justify-between">
-        <span className="text-sm font-medium text-slate-200">{label}</span>
-        {hint && <span className="text-xs text-slate-500">{hint}</span>}
+      <div className="mb-2 flex items-baseline justify-between">
+        <span className="tracking-luxe text-[0.62rem] uppercase text-taupe">{label}</span>
+        {hint && <span className="text-xs text-taupe/70">{hint}</span>}
       </div>
-      <div className="flex gap-2">
+      <div className="flex items-end gap-3 border-b border-cream/15 pb-1 focus-within:border-gold">
         <input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
@@ -44,26 +44,26 @@ export function TagInput({ label, hint, values, onChange, placeholder }: TagInpu
             }
           }}
           placeholder={placeholder}
-          className="min-h-11 flex-1 rounded-xl bg-white/10 px-3 text-base text-white placeholder:text-slate-500"
+          className="min-h-10 flex-1 bg-transparent text-base text-cream placeholder:text-taupe/50 focus:outline-none"
         />
         <button
           type="button"
           onClick={add}
-          className="min-h-11 rounded-xl bg-white/15 px-4 text-sm font-medium text-white"
+          className="min-h-10 text-sm text-gold underline decoration-gold/40 underline-offset-4"
         >
           加入
         </button>
       </div>
       {values.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-2">
           {values.map((tag) => (
             <button
               key={tag}
               type="button"
               onClick={() => remove(tag)}
-              className="rounded-full bg-white/10 px-2.5 py-1 text-xs text-slate-200"
+              className="rounded-full border border-gold/30 px-3 py-1 text-xs text-cream/90 hover:border-gold"
             >
-              {tag} ✕
+              {tag} <span className="text-taupe">✕</span>
             </button>
           ))}
         </div>

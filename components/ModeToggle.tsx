@@ -9,12 +9,12 @@ interface ModeToggleProps {
 
 const MODES: { value: DecideMode; label: string }[] = [
   { value: 'nearby', label: '只吃饭' },
-  { value: 'onroute', label: '吃完有 plan' },
+  { value: 'onroute', label: '吃完有约' },
 ]
 
 export function ModeToggle({ value, onChange }: ModeToggleProps) {
   return (
-    <div className="flex w-full rounded-full bg-white/10 p-1 text-sm font-medium">
+    <div className="flex items-center gap-7">
       {MODES.map((mode) => {
         const active = mode.value === value
         return (
@@ -23,11 +23,16 @@ export function ModeToggle({ value, onChange }: ModeToggleProps) {
             type="button"
             onClick={() => onChange(mode.value)}
             aria-pressed={active}
-            className={`min-h-11 flex-1 rounded-full px-4 transition-colors ${
-              active ? 'bg-orange-500 text-white shadow' : 'text-slate-300'
+            className={`relative min-h-11 pb-2 text-base transition-colors ${
+              active ? 'text-cream' : 'text-taupe hover:text-cream/80'
             }`}
           >
             {mode.label}
+            <span
+              className={`absolute inset-x-0 bottom-0 h-px origin-left bg-gold transition-transform duration-300 ${
+                active ? 'scale-x-100' : 'scale-x-0'
+              }`}
+            />
           </button>
         )
       })}

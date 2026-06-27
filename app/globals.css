@@ -1,10 +1,18 @@
 @import "tailwindcss";
 
+/* 深夜食堂 — warm oxblood ink, candle-gold, cream. Tinted neutrals, no pure black. */
 @theme {
-  --color-bg: #0b1020;
-  --color-bg-soft: #141b30;
-  --color-accent: #f97316;
-  --color-accent-soft: #fb923c;
+  --color-ink: oklch(0.165 0.028 24);
+  --color-ink-2: oklch(0.215 0.034 22);
+  --color-oxblood: oklch(0.31 0.095 18);
+  --color-gold: oklch(0.82 0.105 84);
+  --color-gold-soft: oklch(0.72 0.085 78);
+  --color-cream: oklch(0.935 0.022 78);
+  --color-taupe: oklch(0.7 0.022 60);
+  --color-rose: oklch(0.66 0.12 22);
+
+  --font-display: var(--font-fraunces), Georgia, "Songti SC", serif;
+  --font-serif: var(--font-noto), "Songti SC", "Noto Serif CJK SC", "Songti TC", serif;
 }
 
 html {
@@ -12,18 +20,97 @@ html {
 }
 
 body {
-  background:
-    radial-gradient(120% 80% at 50% -10%, #1e293b 0%, var(--color-bg) 55%);
-  color: #f8fafc;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial,
-    "PingFang SC", "Microsoft YaHei", sans-serif;
+  background-color: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-serif);
   -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
-/* Respect device safe areas (notch / home indicator) on mobile. */
+/* Candle-lit vignette + faint warm pool of light from the top. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(115% 70% at 50% -8%, oklch(0.27 0.06 30) 0%, transparent 55%),
+    radial-gradient(140% 100% at 50% 120%, oklch(0.12 0.02 24) 0%, transparent 60%);
+}
+
+/* Fine film grain so flat dark areas never look like plastic. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Hairline rule in gold, used as a refined divider. */
+.rule-gold {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--color-gold) 60%, transparent) 18%,
+    color-mix(in oklch, var(--color-gold) 60%, transparent) 82%,
+    transparent
+  );
+}
+
+.tracking-luxe {
+  letter-spacing: 0.32em;
+}
+
+/* Staggered entrance: set --d per element for a choreographed page load. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reveal {
+  animation: rise 0.7s var(--d, 0ms) both cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Slow gold shimmer for the "considering…" state. */
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.shimmer {
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+input[type="range"] {
+  accent-color: var(--color-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .shimmer {
+    animation: none;
+  }
+}
+
+/* Respect device safe areas (notch / home indicator). */
 .safe-px {
-  padding-left: max(1rem, env(safe-area-inset-left));
-  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
 }
 .safe-pt {
   padding-top: max(1rem, env(safe-area-inset-top));
