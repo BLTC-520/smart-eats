@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 万选吃饭 · smart-eats
 
-## Getting Started
+一键决定吃什么 —— 吉隆坡 (KL) 的极简选餐 web app。打开网页，按一个大按钮，它根据你们的口味偏好随机推一家餐厅，不再纠结。
 
-First, run the development server:
+## 两种模式
+
+1. **只吃饭** — 以当前定位（或选一个区）为中心，在半径内随机推一家。
+2. **吃完有 plan** — 输入起点 + 接下来要去的目的地，推荐一家最顺路、绕路最少的餐厅。
+
+口味偏好（喜欢的菜系、特别喜欢、不吃的、是否只看营业中、默认半径）**云端共享**，两支手机同步。
+
+## 技术栈
+
+- Next.js 16 (App Router) + TypeScript + Tailwind v4，mobile-first PWA
+- 餐厅数据 / 路线：**GrabMaps 直连 REST**（`https://maps.grab.com/api/v1`，Bearer 鉴权）
+- 共享偏好：Upstash Redis（可选；未配置时退回非持久的内存存储）
+- 纯领域逻辑（选店、绕路排序、地理计算）有 Vitest 单测覆盖
+
+数据源经 `PlacesProvider` 接口隔离（`lib/grab/`），将来可替换为 Google / OSM 而不动 UI。
+
+## 本地开发
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env   # 填入 GRAB_MAPS_API_KEY
+npm install
+npm run dev            # http://localhost:3000
+npm test               # 单元测试
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 环境变量
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| 变量 | 必需 | 说明 |
+|---|---|---|
+| `GRAB_MAPS_API_KEY` | ✅ | GrabMaps Platform key（仅服务端使用）|
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | – | 云端共享偏好；缺省用内存存储 |
+| `APP_PASSCODE` | – | 可选访问口令 |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 部署
 
-## Learn More
+部署在 Vercel。在项目 Settings → Environment Variables 配置上面的变量后，push 到默认分支即自动部署。
 
-To learn more about Next.js, take a look at the following resources:
+## 已知限制
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Grab POI 是「店」级数据（名字、菜系类目、地址、营业时间），没有菜单/食材或评分/价位。因此「不吃 XX」按店名/菜系关键词近似排除，而非真实菜品过滤。
