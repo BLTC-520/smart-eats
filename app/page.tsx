@@ -7,6 +7,7 @@ import { ModeToggle } from '@/components/ModeToggle'
 import { PlacePicker, type PlaceValue } from '@/components/PlacePicker'
 import { CuisinePicker } from '@/components/CuisinePicker'
 import { SpinWheel } from '@/components/SpinWheel'
+import { SearchingLoader } from '@/components/SearchingLoader'
 import { ResultCard } from '@/components/ResultCard'
 import { KL_CENTER } from '@/lib/kl'
 import { getErrorMessage } from '@/lib/errors'
@@ -43,6 +44,14 @@ async function postJson<T>(url: string, body: unknown): Promise<T> {
   return json.data
 }
 
+/** One-liner above the wheel: how many we found vs how many are on the wheel now. */
+function wheelHeadline(wheel: Wheel): string {
+  const place = wheel.mode === 'onroute' ? '顺路' : '附近'
+  const shown = wheel.candidates.length
+  if (wheel.totalFound <= shown) return `${place}就这 ${shown} 家 · 戳中间转一转 👇`
+  return `${place}找到 ${wheel.totalFound} 间 · 先转这 ${shown} 家，换一批看更多 👇`
+}
+
 function toResult(wheel: Wheel, index: number, origin: LatLng, destination: LatLng): DecideResult {
   if (wheel.mode === 'nearby') {
     const candidate = wheel.candidates[index]
@@ -70,9 +79,17 @@ export default function HomePage() {
 
   const [wheel, setWheel] = useState<Wheel | null>(null)
   const [result, setResult] = useState<DecideResult | null>(null)
-  const [loading, setLoading] = useState(false)
+  // null = idle; { found: null } = searching; { found: n } = the "found n!" reveal.
+  const [searching, setSearching] = useState<{ found: number | null } | null>(null)
   const [rerolling, setRerolling] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Hold the celebratory "found N!" beat, then drop into the wheel.
+  useEffect(() => {
+    if (searching?.found == null) return
+    const timer = setTimeout(() => setSearching(null), 1500)
+    return () => clearTimeout(timer)
+  }, [searching])
 
   async function fetchWheel(excludeIds: string[]): Promise<Wheel> {
     if (mode === 'nearby') {
@@ -100,16 +117,18 @@ export default function HomePage() {
       return
     }
     setError(null)
-    if (fresh) setLoading(true)
+    if (fresh) setSearching({ found: null })
     else setRerolling(true)
     try {
       const next = await fetchWheel(excludeIds)
       setWheel(next)
       setResult(null)
+      // Show the "found N!" beat; the effect above hands off to the wheel.
+      if (fresh) setSearching({ found: next.totalFound })
     } catch (cause) {
       setError(getErrorMessage(cause))
+      setSearching(null)
     } finally {
-      setLoading(false)
       setRerolling(false)
     }
   }
@@ -118,13 +137,16 @@ export default function HomePage() {
     setWheel(null)
     setResult(null)
     setError(null)
+    setSearching(null)
   }
 
   return (
     <main className="safe-px safe-pt safe-pb mx-auto flex min-h-dvh w-full max-w-md flex-col overflow-x-hidden">
       <header className="flex items-center justify-between py-3">
         <span className="wiggle inline-block text-3xl text-ink">万选食堂</span>
-        {wheel ? (
+        {searching ? (
+          <span className="text-xl text-ink-soft/60">找店中…</span>
+        ) : wheel ? (
           <button type="button" onClick={backToSetup} className="text-xl text-ink-soft hover:text-ink">
             ← 重选
           </button>
@@ -135,7 +157,9 @@ export default function HomePage() {
         )}
       </header>
 
-      {!wheel ? (
+      {searching ? (
+        <SearchingLoader mode={mode} found={searching.found} />
+      ) : !wheel ? (
         <section className="flex flex-1 flex-col">
           <h1 className="pop mt-6 text-[2.7rem] leading-[1.05] text-ink" style={delay(40)}>
             今天吃啥？<span className="inline-block tilt-r">🍜</span>
@@ -179,20 +203,18 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => loadWheel([], true)}
-              disabled={loading}
+              disabled={searching !== null}
               className="btn-pop bob min-h-16 w-full px-6 text-3xl text-ink"
               style={{ background: 'var(--color-tomato)' }}
             >
-              {loading ? '找店中…🔎' : '🎡 去转盘！'}
+              🎡 去转盘！
             </button>
             {error && <p className="px-4 text-center text-lg text-tomato">{error}</p>}
           </div>
         </section>
       ) : (
         <section className="flex flex-1 flex-col pt-3">
-          <p className="text-center text-xl text-ink-soft">
-            转出 {wheel.candidates.length} 家 · 戳中间转一转 👇
-          </p>
+          <p className="text-center text-xl text-ink-soft">{wheelHeadline(wheel)}</p>
           <div className="mt-5">
             <SpinWheel
               key={wheel.candidates.map((c) => c.restaurant.id).join(',')}

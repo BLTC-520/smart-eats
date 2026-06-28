@@ -12,6 +12,8 @@ export interface NearbyCandidate {
 
 export interface NearbyWheel {
   candidates: NearbyCandidate[]
+  /** How many matching places exist around the area (the wheel shows a sample). */
+  totalFound: number
 }
 
 export interface OnRouteCandidate {
@@ -23,20 +25,22 @@ export interface OnRouteWheel {
   candidates: OnRouteCandidate[]
   baseDistanceKm: number
   baseDurationMin: number
+  /** How many on-the-way places exist (the wheel shows a sample of them). */
+  totalFound: number
 }
 
-const NEARBY_SEARCH_LIMIT = 30
-const CORRIDOR_SEARCH_LIMIT = 15
+const NEARBY_SEARCH_LIMIT = 50
+const CORRIDOR_SEARCH_LIMIT = 20
 const ROUTE_SAMPLE_POINTS = 4
-const ON_ROUTE_SHORTLIST = 14
+const ON_ROUTE_SHORTLIST = 24
 /** A stop is "on the way" only if its detour stays under this share of the trip… */
 const MAX_DETOUR_RATIO = 0.4
 /** …or this many km, whichever is larger (keeps short trips usable). */
 const MAX_DETOUR_FLOOR_KM = 1.5
 /** Below this many on-the-way stops, relax the cap so the wheel isn't empty. */
 const MIN_ON_ROUTE = 4
-/** How many slices the spin wheel can hold. */
-const WHEEL_SIZE = 8
+/** How many slices the spin wheel shows at once (a sample of the full pool). */
+const WHEEL_SIZE = 12
 /** Below this, a cuisine filter is treated as too strict and ignored. */
 const MIN_CUISINE_MATCHES = 3
 
@@ -116,6 +120,7 @@ export async function nearbyWheel(
       restaurant,
       distanceKm: haversineKm(userLocation, restaurant.location),
     })),
+    totalFound: filtered.length,
   }
 }
 
@@ -146,12 +151,14 @@ export async function onRouteWheel(
   const detourCap = Math.max(MAX_DETOUR_FLOOR_KM, route.distanceKm * MAX_DETOUR_RATIO)
   const onTheWay = ranked.filter((r) => r.detourKm <= detourCap)
   const pool = onTheWay.length >= MIN_ON_ROUTE ? onTheWay : ranked.slice(0, ON_ROUTE_SHORTLIST)
-  const shortlist = applyCuisineFilter(pool, cuisines).slice(0, ON_ROUTE_SHORTLIST)
+  const matches = applyCuisineFilter(pool, cuisines)
+  const shortlist = matches.slice(0, ON_ROUTE_SHORTLIST)
 
   const winners = sampleWheel(shortlist, effective, WHEEL_SIZE, excludeIds)
   return {
     candidates: winners.map((restaurant) => ({ restaurant, detourKm: restaurant.detourKm })),
     baseDistanceKm: route.distanceKm,
     baseDurationMin: route.durationMin,
+    totalFound: matches.length,
   }
 }

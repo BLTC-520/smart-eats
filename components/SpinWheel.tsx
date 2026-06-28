@@ -67,8 +67,8 @@ export function SpinWheel({ items, onSpinStart, onResult }: SpinWheelProps) {
   const n = items.length
   const seg = 360 / n
   const colors = useMemo(() => sliceColors(n), [n])
-  const fontSize = n > 6 ? 9 : n > 4 ? 10.5 : 12
-  const maxChars = n > 6 ? 8 : 11
+  const fontSize = n > 10 ? 8 : n > 6 ? 9 : n > 4 ? 10.5 : 12
+  const maxChars = n > 10 ? 7 : n > 6 ? 8 : 11
 
   // The parent re-mounts this via `key` for a new batch, so a fresh start needs
   // only the unmount cleanup below — no in-effect state reset required.
