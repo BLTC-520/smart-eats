@@ -12,8 +12,8 @@ const latLngSchema = z.object({
 })
 
 const requestSchema = z.object({
-  center: latLngSchema,
-  radiusKm: z.number().min(0.5).max(15).default(3),
+  userLocation: latLngSchema,
+  diningArea: latLngSchema,
   cuisines: z.array(z.string()).max(20).default([]),
   excludeIds: z.array(z.string()).default([]),
 })
@@ -30,8 +30,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     const wheel = await nearbyWheel(
       getPlacesProvider(),
       prefs,
-      parsed.data.center,
-      parsed.data.radiusKm,
+      parsed.data.userLocation,
+      parsed.data.diningArea,
       parsed.data.cuisines,
       parsed.data.excludeIds,
     )

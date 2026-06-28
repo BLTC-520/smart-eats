@@ -112,7 +112,7 @@ export function PreferencesForm() {
           min={1}
           max={8}
         />
-        <p className="mt-1 text-base text-ink-soft/80">「只吃饭」时的默认方圆。</p>
+        <p className="mt-1 text-base text-ink-soft/80">「只吃饭」时，在想吃的那一带附近搜多大范围。</p>
       </div>
 
       <div className="space-y-3">

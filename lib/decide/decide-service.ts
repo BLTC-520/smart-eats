@@ -82,29 +82,33 @@ function sampleWheel<T extends Restaurant>(
   return picked
 }
 
-/** Scenario 1 — "just eat": gather a wheel of places within `radiusKm` of `center`. */
+/** Scenario 1 — "just eat": the user is at `userLocation` and wants to eat
+ *  around `diningArea`. Search that area (range from the saved preference),
+ *  but report each place's distance from where the user actually is. */
 export async function nearbyWheel(
   provider: PlacesProvider,
   prefs: Preferences,
-  center: LatLng,
-  radiusKm: number,
+  userLocation: LatLng,
+  diningArea: LatLng,
   cuisines: readonly string[] = [],
   excludeIds: readonly string[] = [],
 ): Promise<NearbyWheel> {
   const effective = withCuisines(prefs, cuisines)
   const keywords = deriveSearchKeywords(effective)
-  const candidates = await gatherCandidates(provider, center, keywords, NEARBY_SEARCH_LIMIT)
+  const candidates = await gatherCandidates(provider, diningArea, keywords, NEARBY_SEARCH_LIMIT)
 
-  const withinRadius = candidates.filter((r) => haversineKm(center, r.location) <= radiusKm)
-  // Fall back to all candidates when nothing falls inside the radius.
-  const pool = withinRadius.length > 0 ? withinRadius : candidates
+  const withinArea = candidates.filter(
+    (r) => haversineKm(diningArea, r.location) <= prefs.defaultRadiusKm,
+  )
+  // Fall back to all candidates when nothing falls inside the area range.
+  const pool = withinArea.length > 0 ? withinArea : candidates
   const filtered = applyCuisineFilter(pool, cuisines)
 
   const winners = sampleWheel(filtered, effective, WHEEL_SIZE, excludeIds)
   return {
     candidates: winners.map((restaurant) => ({
       restaurant,
-      distanceKm: haversineKm(center, restaurant.location),
+      distanceKm: haversineKm(userLocation, restaurant.location),
     })),
   }
 }

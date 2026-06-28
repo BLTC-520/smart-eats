@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { ModeToggle } from '@/components/ModeToggle'
-import { RadiusSlider } from '@/components/RadiusSlider'
 import { PlacePicker, type PlaceValue } from '@/components/PlacePicker'
 import { CuisinePicker } from '@/components/CuisinePicker'
 import { SpinWheel } from '@/components/SpinWheel'
@@ -18,7 +17,6 @@ import type {
   NearbyWheel,
   OnRouteWheel,
 } from '@/lib/client/types'
-import type { Preferences } from '@/lib/prefs/schema'
 
 const DEFAULT_PLACE: PlaceValue = { label: 'KLCC', center: KL_CENTER }
 
@@ -61,8 +59,8 @@ function toResult(wheel: Wheel, index: number): DecideResult {
 
 export default function HomePage() {
   const [mode, setMode] = useState<DecideMode>('nearby')
-  const [nearby, setNearby] = useState<PlaceValue>(DEFAULT_PLACE)
-  const [radiusKm, setRadiusKm] = useState(3)
+  const [userLocation, setUserLocation] = useState<PlaceValue>(DEFAULT_PLACE)
+  const [diningArea, setDiningArea] = useState<PlaceValue>(DEFAULT_PLACE)
   const [origin, setOrigin] = useState<PlaceValue>(DEFAULT_PLACE)
   const [destination, setDestination] = useState<PlaceValue | null>(null)
   const [cuisines, setCuisines] = useState<string[]>([])
@@ -73,20 +71,11 @@ export default function HomePage() {
   const [rerolling, setRerolling] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetch('/api/preferences')
-      .then((response) => response.json() as Promise<ApiResponse<Preferences>>)
-      .then((json) => {
-        if (json.success && json.data) setRadiusKm(json.data.defaultRadiusKm)
-      })
-      .catch(() => undefined)
-  }, [])
-
   async function fetchWheel(excludeIds: string[]): Promise<Wheel> {
     if (mode === 'nearby') {
       const data = await postJson<NearbyWheel>('/api/decide', {
-        center: nearby.center,
-        radiusKm,
+        userLocation: userLocation.center,
+        diningArea: diningArea.center,
         cuisines,
         excludeIds,
       })
@@ -159,8 +148,13 @@ export default function HomePage() {
           <div className="pop mt-7 space-y-6" style={delay(240)}>
             {mode === 'nearby' ? (
               <>
-                <PlacePicker title="在哪一带？📍" value={nearby} onChange={setNearby} />
-                <RadiusSlider value={radiusKm} onChange={setRadiusKm} />
+                <PlacePicker title="你现在在哪？📍" value={userLocation} onChange={setUserLocation} />
+                <PlacePicker
+                  title="想去哪一带吃？🍽️"
+                  value={diningArea}
+                  onChange={setDiningArea}
+                  allowGps={false}
+                />
               </>
             ) : (
               <>
