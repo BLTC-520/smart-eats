@@ -1,7 +1,14 @@
 'use client'
 
 import type { DecideResult } from '@/lib/client/types'
-import { formatKm, formatMinutes, mapsSearchUrl } from '@/lib/client/format'
+import {
+  estimateTripMinutes,
+  formatKm,
+  formatMinutes,
+  mapsDirectionsUrl,
+  mapsSearchUrl,
+} from '@/lib/client/format'
+import { RouteSketch } from '@/components/RouteSketch'
 
 interface ResultCardProps {
   result: DecideResult
@@ -10,10 +17,10 @@ interface ResultCardProps {
   onBack: () => void
 }
 
-function metricLine(result: DecideResult): string {
-  if (result.mode === 'nearby') return `离你大概 ${formatKm(result.distanceKm)} 🚶`
-  if (result.detourKm < 0.2) return `几乎不绕路 · 全程约 ${formatMinutes(result.baseDurationMin)} 🚗`
-  return `顺路多绕 ${formatKm(result.detourKm)} · 全程约 ${formatMinutes(result.baseDurationMin)} 🚗`
+function onRouteMetric(detourKm: number, baseDistanceKm: number, baseDurationMin: number): string {
+  const tripMin = estimateTripMinutes(baseDurationMin, baseDistanceKm, detourKm)
+  const detour = detourKm < 0.2 ? '几乎不绕路' : `顺路多绕 ${formatKm(detourKm)}`
+  return `${detour} · 全程开车约 ${formatMinutes(tripMin)} 🚗`
 }
 
 export function ResultCard({ result, rerolling = false, onReroll, onBack }: ResultCardProps) {
@@ -36,18 +43,62 @@ export function ResultCard({ result, rerolling = false, onReroll, onBack }: Resu
         </p>
       )}
 
-      <p className="mt-3 text-xl text-ink">{metricLine(result)}</p>
-      {restaurant.address && <p className="mt-1 text-base leading-relaxed text-ink-soft">{restaurant.address}</p>}
+      {result.mode === 'nearby' ? (
+        <>
+          <p className="mt-3 text-xl text-ink">离你大概 {formatKm(result.distanceKm)} 🚶</p>
+          {restaurant.address && (
+            <p className="mt-1 text-base leading-relaxed text-ink-soft">{restaurant.address}</p>
+          )}
+          <a
+            href={mapsSearchUrl(restaurant.location)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-pop mt-5 flex min-h-13 w-full items-center justify-center px-4 text-2xl text-ink"
+            style={{ background: 'var(--color-sun)' }}
+          >
+            📍 带我去！
+          </a>
+        </>
+      ) : (
+        <>
+          <p className="mt-3 text-lg text-ink">
+            {onRouteMetric(result.detourKm, result.baseDistanceKm, result.baseDurationMin)}
+          </p>
+          {restaurant.address && (
+            <p className="mt-1 text-base leading-relaxed text-ink-soft">{restaurant.address}</p>
+          )}
 
-      <a
-        href={mapsSearchUrl(restaurant.location)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="btn-pop mt-5 flex min-h-13 w-full items-center justify-center px-4 text-2xl text-ink"
-        style={{ background: 'var(--color-sun)' }}
-      >
-        📍 带我去！
-      </a>
+          <div className="mt-4">
+            <RouteSketch
+              origin={result.origin}
+              restaurant={restaurant.location}
+              destination={result.destination}
+              restaurantName={restaurant.name}
+            />
+          </div>
+
+          <div className="mt-4 flex gap-3">
+            <a
+              href={mapsDirectionsUrl(result.origin, restaurant.location)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-pop flex min-h-13 flex-1 items-center justify-center px-3 text-lg text-ink"
+              style={{ background: '#fffdf6' }}
+            >
+              🍽️ 只去餐厅
+            </a>
+            <a
+              href={mapsDirectionsUrl(result.origin, result.destination, restaurant.location)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-pop flex min-h-13 flex-1 items-center justify-center px-3 text-lg text-ink"
+              style={{ background: 'var(--color-sun)' }}
+            >
+              🚗 顺路全程
+            </a>
+          </div>
+        </>
+      )}
 
       <div className="mt-3 flex gap-3">
         <button

@@ -24,9 +24,23 @@ export interface Restaurant {
   openNow?: boolean
 }
 
+/** A searchable place of any kind (park, mall, landmark…), not just food. */
+export interface Place {
+  id: string
+  name: string
+  location: LatLng
+  address?: string
+}
+
 export interface SearchFoodParams {
   center: LatLng
   keyword?: string
+  limit?: number
+}
+
+export interface SearchPlacesParams {
+  query: string
+  near?: LatLng
   limit?: number
 }
 
@@ -44,5 +58,6 @@ export interface RouteResult {
 /** Abstraction over a maps/places backend. */
 export interface PlacesProvider {
   searchFood(params: SearchFoodParams): Promise<Restaurant[]>
+  searchPlaces(params: SearchPlacesParams): Promise<Place[]>
   calculateRoute(params: RouteParams): Promise<RouteResult>
 }

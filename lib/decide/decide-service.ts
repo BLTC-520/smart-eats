@@ -29,6 +29,12 @@ const NEARBY_SEARCH_LIMIT = 30
 const CORRIDOR_SEARCH_LIMIT = 15
 const ROUTE_SAMPLE_POINTS = 4
 const ON_ROUTE_SHORTLIST = 14
+/** A stop is "on the way" only if its detour stays under this share of the trip… */
+const MAX_DETOUR_RATIO = 0.4
+/** …or this many km, whichever is larger (keeps short trips usable). */
+const MAX_DETOUR_FLOOR_KM = 1.5
+/** Below this many on-the-way stops, relax the cap so the wheel isn't empty. */
+const MIN_ON_ROUTE = 4
 /** How many slices the spin wheel can hold. */
 const WHEEL_SIZE = 8
 /** Below this, a cuisine filter is treated as too strict and ignored. */
@@ -136,7 +142,11 @@ export async function onRouteWheel(
   const candidates = dedupeById(batches.flat())
 
   const ranked = rankByDetour(candidates, origin, destination, route.distanceKm)
-  const shortlist = applyCuisineFilter(ranked, cuisines).slice(0, ON_ROUTE_SHORTLIST)
+  // Only keep genuinely on-the-way stops; relax to the least-detour ones if too few.
+  const detourCap = Math.max(MAX_DETOUR_FLOOR_KM, route.distanceKm * MAX_DETOUR_RATIO)
+  const onTheWay = ranked.filter((r) => r.detourKm <= detourCap)
+  const pool = onTheWay.length >= MIN_ON_ROUTE ? onTheWay : ranked.slice(0, ON_ROUTE_SHORTLIST)
+  const shortlist = applyCuisineFilter(pool, cuisines).slice(0, ON_ROUTE_SHORTLIST)
 
   const winners = sampleWheel(shortlist, effective, WHEEL_SIZE, excludeIds)
   return {

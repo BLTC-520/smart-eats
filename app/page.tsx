@@ -14,6 +14,7 @@ import type {
   ApiResponse,
   DecideMode,
   DecideResult,
+  LatLng,
   NearbyWheel,
   OnRouteWheel,
 } from '@/lib/client/types'
@@ -42,7 +43,7 @@ async function postJson<T>(url: string, body: unknown): Promise<T> {
   return json.data
 }
 
-function toResult(wheel: Wheel, index: number): DecideResult {
+function toResult(wheel: Wheel, index: number, origin: LatLng, destination: LatLng): DecideResult {
   if (wheel.mode === 'nearby') {
     const candidate = wheel.candidates[index]
     return { mode: 'nearby', restaurant: candidate.restaurant, distanceKm: candidate.distanceKm }
@@ -54,6 +55,8 @@ function toResult(wheel: Wheel, index: number): DecideResult {
     detourKm: candidate.detourKm,
     baseDistanceKm: wheel.baseDistanceKm,
     baseDurationMin: wheel.baseDurationMin,
+    origin,
+    destination,
   }
 }
 
@@ -148,18 +151,25 @@ export default function HomePage() {
           <div className="pop mt-7 space-y-6" style={delay(240)}>
             {mode === 'nearby' ? (
               <>
-                <PlacePicker title="你现在在哪？📍" value={userLocation} onChange={setUserLocation} />
+                <PlacePicker title="你现在在哪？📍" value={userLocation} onChange={setUserLocation} allowSearch />
                 <PlacePicker
                   title="想去哪一带吃？🍽️"
                   value={diningArea}
                   onChange={setDiningArea}
                   allowGps={false}
+                  allowSearch
                 />
               </>
             ) : (
               <>
-                <PlacePicker title="现在人在？📍" value={origin} onChange={setOrigin} />
-                <PlacePicker title="待会要去？🚩" value={destination} onChange={setDestination} allowGps={false} />
+                <PlacePicker title="现在人在？📍" value={origin} onChange={setOrigin} allowSearch />
+                <PlacePicker
+                  title="待会要去？🚩"
+                  value={destination}
+                  onChange={setDestination}
+                  allowGps={false}
+                  allowSearch
+                />
               </>
             )}
             <CuisinePicker selected={cuisines} onChange={setCuisines} />
@@ -188,7 +198,9 @@ export default function HomePage() {
               key={wheel.candidates.map((c) => c.restaurant.id).join(',')}
               items={wheel.candidates.map((c) => ({ id: c.restaurant.id, label: c.restaurant.name }))}
               onSpinStart={() => setResult(null)}
-              onResult={(index) => setResult(toResult(wheel, index))}
+              onResult={(index) =>
+                setResult(toResult(wheel, index, origin.center, destination?.center ?? origin.center))
+              }
             />
           </div>
 

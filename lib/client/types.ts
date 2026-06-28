@@ -1,6 +1,6 @@
 import type { ApiResponse } from '@/lib/api'
 import type { NearbyWheel, OnRouteWheel } from '@/lib/decide/decide-service'
-import type { Restaurant } from '@/lib/grab/provider'
+import type { LatLng, Place, Restaurant } from '@/lib/grab/provider'
 
 export type DecideMode = 'nearby' | 'onroute'
 
@@ -13,6 +13,8 @@ export type DecideResult =
       detourKm: number
       baseDistanceKm: number
       baseDurationMin: number
+      origin: LatLng
+      destination: LatLng
     }
 
-export type { ApiResponse, NearbyWheel, OnRouteWheel, Restaurant }
+export type { ApiResponse, NearbyWheel, OnRouteWheel, Place, Restaurant, LatLng }

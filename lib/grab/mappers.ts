@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { LatLng, Restaurant, RouteResult } from '@/lib/grab/provider'
+import type { LatLng, Place, Restaurant, RouteResult } from '@/lib/grab/provider'
 import { isOpenNow } from '@/lib/grab/opening-hours'
 import { decodePolyline6 } from '@/lib/decide/geo'
 
@@ -79,6 +79,27 @@ export function mapSearchResponse(raw: unknown, now: Date = new Date()): Restaur
     })
   }
   return restaurants
+}
+
+/** Map a raw Grab search response into Places of any kind (parks, malls, …). */
+export function mapPlacesResponse(raw: unknown): Place[] {
+  const response = grabSearchResponseSchema.safeParse(raw)
+  if (!response.success || !response.data.places) return []
+
+  const places: Place[] = []
+  const seen = new Set<string>()
+  for (const candidate of response.data.places) {
+    const place = grabPlaceSchema.safeParse(candidate)
+    if (!place.success || seen.has(place.data.poi_id)) continue
+    seen.add(place.data.poi_id)
+    places.push({
+      id: place.data.poi_id,
+      name: place.data.name,
+      location: { lat: place.data.location.latitude, lng: place.data.location.longitude },
+      address: place.data.formatted_address,
+    })
+  }
+  return places
 }
 
 /** Map a raw Grab direction response into a normalized RouteResult. */
