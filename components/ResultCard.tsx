@@ -11,64 +11,61 @@ interface ResultCardProps {
 }
 
 function metricLine(result: DecideResult): string {
-  if (result.mode === 'nearby') return `距你约 ${formatKm(result.distanceKm)}`
-  if (result.detourKm < 0.2) return `几乎不绕路 · 全程约 ${formatMinutes(result.baseDurationMin)}`
-  return `顺路只多绕 ${formatKm(result.detourKm)} · 全程约 ${formatMinutes(result.baseDurationMin)}`
+  if (result.mode === 'nearby') return `离你大概 ${formatKm(result.distanceKm)} 🚶`
+  if (result.detourKm < 0.2) return `几乎不绕路 · 全程约 ${formatMinutes(result.baseDurationMin)} 🚗`
+  return `顺路多绕 ${formatKm(result.detourKm)} · 全程约 ${formatMinutes(result.baseDurationMin)} 🚗`
 }
 
 export function ResultCard({ result, rerolling = false, onReroll, onBack }: ResultCardProps) {
   const { restaurant } = result
 
   return (
-    <div className="reveal flex flex-col">
-      <button
-        type="button"
-        onClick={onBack}
-        className="self-start text-sm text-taupe underline decoration-taupe/40 underline-offset-4 hover:text-cream"
-      >
-        ← 重新决定
-      </button>
-
-      <p className="mt-8 tracking-luxe text-[0.62rem] uppercase text-gold-soft">今晚的选择</p>
-      <h2 className="mt-3 font-display text-[2.6rem] font-medium italic leading-[1.05] text-cream">
-        {restaurant.name}
-      </h2>
+    <div className="pop sticker tilt-l mt-6 p-5">
+      <p className="text-xl text-ink-soft">🎉 就吃这家！</p>
+      <h2 className="mt-1 text-[2.3rem] leading-[1.1] text-ink">{restaurant.name}</h2>
 
       {(restaurant.cuisines.length > 0 || restaurant.openNow !== undefined) && (
-        <p className="mt-4 text-sm text-taupe">
+        <p className="mt-2 text-lg text-ink-soft">
           {restaurant.cuisines.slice(0, 3).join(' · ')}
           {restaurant.openNow === true && (
-            <span className="text-gold-soft">{restaurant.cuisines.length ? ' · 此刻营业' : '此刻营业'}</span>
+            <span className="text-mint">{restaurant.cuisines.length ? ' · 还开着 ✅' : '还开着 ✅'}</span>
           )}
           {restaurant.openNow === false && (
-            <span className="text-rose">{restaurant.cuisines.length ? ' · 或已打烊' : '或已打烊'}</span>
+            <span className="text-tomato">{restaurant.cuisines.length ? ' · 可能打烊了 😴' : '可能打烊了 😴'}</span>
           )}
         </p>
       )}
 
-      <div className="rule-gold my-6" />
+      <p className="mt-3 text-xl text-ink">{metricLine(result)}</p>
+      {restaurant.address && <p className="mt-1 text-base leading-relaxed text-ink-soft">{restaurant.address}</p>}
 
-      <p className="font-serif text-lg text-gold">{metricLine(result)}</p>
-      {restaurant.address && <p className="mt-2 text-sm leading-relaxed text-taupe">{restaurant.address}</p>}
+      <a
+        href={mapsSearchUrl(restaurant.location)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn-pop mt-5 flex min-h-13 w-full items-center justify-center px-4 text-2xl text-ink"
+        style={{ background: 'var(--color-sun)' }}
+      >
+        📍 带我去！
+      </a>
 
-      <div className="mt-8 flex items-center gap-5">
-        <a
-          href={mapsSearchUrl(restaurant.location)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-gold font-serif text-base
-            font-[600] text-ink transition-[filter] hover:brightness-105"
-        >
-          在地图打开
-        </a>
+      <div className="mt-3 flex gap-3">
         <button
           type="button"
           onClick={onReroll}
           disabled={rerolling}
-          className={`min-h-12 text-base text-cream underline decoration-gold/50 underline-offset-4
-            disabled:opacity-60 ${rerolling ? 'shimmer' : ''}`}
+          className="btn-pop min-h-12 flex-1 px-3 text-lg text-ink"
+          style={{ background: 'var(--color-bubble)' }}
         >
-          {rerolling ? '换…' : '换一家'}
+          {rerolling ? '换…' : '🎲 换一批'}
+        </button>
+        <button
+          type="button"
+          onClick={onBack}
+          className="btn-pop min-h-12 flex-1 px-3 text-lg text-ink"
+          style={{ background: '#fffdf6' }}
+        >
+          ← 重选
         </button>
       </div>
     </div>

@@ -10,10 +10,10 @@ interface RadiusSliderProps {
 
 export function RadiusSlider({ value, onChange, min = 1, max = 5, step = 0.5 }: RadiusSliderProps) {
   return (
-    <label className="block py-3">
+    <label className="block">
       <span className="flex items-baseline justify-between">
-        <span className="tracking-luxe text-[0.62rem] uppercase text-taupe">方圆</span>
-        <span className="font-display text-base italic text-gold">{value} 公里</span>
+        <span className="text-2xl text-ink">走多远？🚶</span>
+        <span className="text-2xl text-tomato">{value} 公里</span>
       </span>
       <input
         type="range"
@@ -22,7 +22,7 @@ export function RadiusSlider({ value, onChange, min = 1, max = 5, step = 0.5 }: 
         step={step}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="mt-3 h-1 w-full cursor-pointer appearance-none rounded-full bg-cream/15"
+        className="mt-3 h-3 w-full cursor-pointer appearance-none rounded-full border-[2.5px] border-ink bg-paper-2"
         aria-label="搜索半径（公里）"
       />
     </label>

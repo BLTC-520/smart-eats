@@ -30,10 +30,10 @@ export function TagInput({ label, hint, values, onChange, placeholder }: TagInpu
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="tracking-luxe text-[0.62rem] uppercase text-taupe">{label}</span>
-        {hint && <span className="text-xs text-taupe/70">{hint}</span>}
+        <span className="text-2xl text-ink">{label}</span>
+        {hint && <span className="text-base text-ink-soft/70">{hint}</span>}
       </div>
-      <div className="flex items-end gap-3 border-b border-cream/15 pb-1 focus-within:border-gold">
+      <div className="flex items-stretch gap-2.5">
         <input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
@@ -44,12 +44,13 @@ export function TagInput({ label, hint, values, onChange, placeholder }: TagInpu
             }
           }}
           placeholder={placeholder}
-          className="min-h-10 flex-1 bg-transparent text-base text-cream placeholder:text-taupe/50 focus:outline-none"
+          className="sticker min-h-12 flex-1 px-4 text-lg text-ink placeholder:text-ink-soft/45 focus:outline-none"
         />
         <button
           type="button"
           onClick={add}
-          className="min-h-10 text-sm text-gold underline decoration-gold/40 underline-offset-4"
+          className="btn-pop min-h-12 px-4 text-lg text-ink"
+          style={{ background: 'var(--color-sky)' }}
         >
           加入
         </button>
@@ -61,9 +62,10 @@ export function TagInput({ label, hint, values, onChange, placeholder }: TagInpu
               key={tag}
               type="button"
               onClick={() => remove(tag)}
-              className="rounded-full border border-gold/30 px-3 py-1 text-xs text-cream/90 hover:border-gold"
+              className="btn-pop px-3 py-1 text-base text-ink"
+              style={{ background: 'var(--color-paper-2)' }}
             >
-              {tag} <span className="text-taupe">✕</span>
+              {tag} <span className="text-tomato">✕</span>
             </button>
           ))}
         </div>

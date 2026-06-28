@@ -1,11 +1,18 @@
 import type { ApiResponse } from '@/lib/api'
-import type { NearbyDecision, OnRouteDecision } from '@/lib/decide/decide-service'
+import type { NearbyWheel, OnRouteWheel } from '@/lib/decide/decide-service'
+import type { Restaurant } from '@/lib/grab/provider'
 
 export type DecideMode = 'nearby' | 'onroute'
 
-/** A decision plus the mode it came from, for rendering the result card. */
+/** The restaurant the wheel landed on, plus the metrics for its result card. */
 export type DecideResult =
-  | ({ mode: 'nearby' } & NearbyDecision)
-  | ({ mode: 'onroute' } & OnRouteDecision)
+  | { mode: 'nearby'; restaurant: Restaurant; distanceKm: number }
+  | {
+      mode: 'onroute'
+      restaurant: Restaurant
+      detourKm: number
+      baseDistanceKm: number
+      baseDurationMin: number
+    }
 
-export type { ApiResponse, NearbyDecision, OnRouteDecision }
+export type { ApiResponse, NearbyWheel, OnRouteWheel, Restaurant }

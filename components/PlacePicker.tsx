@@ -36,27 +36,19 @@ export function PlacePicker({ title, value, onChange, allowGps = true }: PlacePi
   }
 
   return (
-    <div className="py-3">
-      <div className="flex items-baseline justify-between">
-        <span className="tracking-luxe text-[0.62rem] uppercase text-taupe">{title}</span>
-        <span
-          className={`max-w-[58%] truncate font-display text-base italic ${
-            value ? 'text-gold' : 'text-taupe/60'
-          }`}
-        >
-          {value ? value.label : '待选'}
-        </span>
-      </div>
+    <div>
+      <p className="mb-2.5 text-2xl text-ink">{title}</p>
 
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
+      <div className="flex flex-wrap gap-2.5">
         {allowGps && (
           <button
             type="button"
             onClick={useMyLocation}
             disabled={locating}
-            className="min-h-9 text-sm text-gold underline decoration-gold/40 underline-offset-4 disabled:opacity-60"
+            className="btn-pop min-h-11 px-4 text-lg text-ink"
+            style={{ background: value?.label === '我的位置' ? 'var(--color-sky)' : '#fffdf6' }}
           >
-            {locating ? '定位中…' : '⌖ 我的定位'}
+            {locating ? '定位中…' : '⌖ 我在这'}
           </button>
         )}
         {KL_DISTRICTS.map((district) => {
@@ -66,11 +58,9 @@ export function PlacePicker({ title, value, onChange, allowGps = true }: PlacePi
               key={district.name}
               type="button"
               onClick={() => onChange({ label: district.name, center: district.center })}
-              className={`min-h-9 border-b text-sm transition-colors ${
-                active
-                  ? 'border-gold text-cream'
-                  : 'border-transparent text-taupe hover:text-cream/80'
-              }`}
+              aria-pressed={active}
+              className="btn-pop min-h-11 px-4 text-lg text-ink"
+              style={{ background: active ? 'var(--color-sky)' : '#fffdf6' }}
             >
               {district.name}
             </button>
@@ -78,7 +68,7 @@ export function PlacePicker({ title, value, onChange, allowGps = true }: PlacePi
         })}
       </div>
 
-      {error && <p className="mt-2 text-xs text-rose">{error}</p>}
+      {error && <p className="mt-2 text-base text-tomato">{error}</p>}
     </div>
   )
 }

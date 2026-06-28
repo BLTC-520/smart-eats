@@ -1,35 +1,35 @@
 import type { Metadata, Viewport } from 'next'
-import { Fraunces, Noto_Serif_SC } from 'next/font/google'
+import { Gaegu, ZCOOL_KuaiLe } from 'next/font/google'
 import './globals.css'
 
-const fraunces = Fraunces({
+// Gaegu = wobbly kid's-handwriting Latin; ZCOOL KuaiLe = bubbly cartoon Chinese.
+const gaegu = Gaegu({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '900'],
-  style: ['normal', 'italic'],
-  variable: '--font-fraunces',
+  weight: ['300', '400', '700'],
+  variable: '--font-gaegu',
   display: 'swap',
 })
 
-const notoSerif = Noto_Serif_SC({
+const kuaile = ZCOOL_KuaiLe({
   subsets: ['latin'],
-  weight: ['400', '600', '900'],
-  variable: '--font-noto',
+  weight: ['400'],
+  variable: '--font-kuaile',
   display: 'swap',
   preload: false,
 })
 
 export const metadata: Metadata = {
-  title: '万选食堂 · 今晚吃什么',
-  description: '吉隆坡 · 深夜食堂。一下决定，今晚就吃这家。',
+  title: '万选食堂 · 转一转吃什么',
+  description: '吉隆坡 · 选个菜系，转个盘，今晚就吃这家！',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: '万选食堂',
   },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#2a1014',
+  themeColor: '#fff4d6',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -39,7 +39,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={`${fraunces.variable} ${notoSerif.variable} h-full antialiased`}>
+    <html lang="zh-CN" className={`${gaegu.variable} ${kuaile.variable} h-full antialiased`}>
       <body className="min-h-dvh">{children}</body>
     </html>
   )

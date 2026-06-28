@@ -7,14 +7,14 @@ interface ModeToggleProps {
   onChange: (mode: DecideMode) => void
 }
 
-const MODES: { value: DecideMode; label: string }[] = [
-  { value: 'nearby', label: '只吃饭' },
-  { value: 'onroute', label: '吃完有约' },
+const MODES: { value: DecideMode; label: string; emoji: string }[] = [
+  { value: 'nearby', label: '只吃饭', emoji: '🍚' },
+  { value: 'onroute', label: '吃完有约', emoji: '🚗' },
 ]
 
 export function ModeToggle({ value, onChange }: ModeToggleProps) {
   return (
-    <div className="flex items-center gap-7">
+    <div className="flex gap-3">
       {MODES.map((mode) => {
         const active = mode.value === value
         return (
@@ -23,16 +23,10 @@ export function ModeToggle({ value, onChange }: ModeToggleProps) {
             type="button"
             onClick={() => onChange(mode.value)}
             aria-pressed={active}
-            className={`relative min-h-11 pb-2 text-base transition-colors ${
-              active ? 'text-cream' : 'text-taupe hover:text-cream/80'
-            }`}
+            className="btn-pop min-h-12 min-w-0 flex-1 truncate px-3 text-xl text-ink"
+            style={{ background: active ? 'var(--color-mint)' : '#fffdf6' }}
           >
-            {mode.label}
-            <span
-              className={`absolute inset-x-0 bottom-0 h-px origin-left bg-gold transition-transform duration-300 ${
-                active ? 'scale-x-100' : 'scale-x-0'
-              }`}
-            />
+            {mode.emoji} {mode.label}
           </button>
         )
       })}

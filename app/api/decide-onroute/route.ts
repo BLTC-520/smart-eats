@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { fail, ok } from '@/lib/api'
 import { getErrorMessage } from '@/lib/errors'
-import { decideOnRoute } from '@/lib/decide/decide-service'
+import { onRouteWheel } from '@/lib/decide/decide-service'
 import { getPlacesProvider } from '@/lib/grab/grab-provider'
 import { getPrefsStore } from '@/lib/prefs/store'
 
@@ -14,6 +14,7 @@ const latLngSchema = z.object({
 const requestSchema = z.object({
   origin: latLngSchema,
   destination: latLngSchema,
+  cuisines: z.array(z.string()).max(20).default([]),
   excludeIds: z.array(z.string()).default([]),
 })
 
@@ -26,19 +27,20 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     const prefs = await getPrefsStore().get()
-    const decision = await decideOnRoute(
+    const wheel = await onRouteWheel(
       getPlacesProvider(),
       prefs,
       parsed.data.origin,
       parsed.data.destination,
+      parsed.data.cuisines,
       parsed.data.excludeIds,
     )
-    if (!decision) {
-      return NextResponse.json(fail('这条路上没找到合口味的餐厅，换个目的地或放宽偏好试试'), {
+    if (wheel.candidates.length === 0) {
+      return NextResponse.json(fail('这条路上没找到这个菜系的餐厅，换个目的地或菜系试试'), {
         status: 404,
       })
     }
-    return NextResponse.json(ok(decision))
+    return NextResponse.json(ok(wheel))
   } catch (error) {
     return NextResponse.json(fail(getErrorMessage(error)), { status: 500 })
   }

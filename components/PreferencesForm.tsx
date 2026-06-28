@@ -57,9 +57,9 @@ export function PreferencesForm() {
   }
 
   return (
-    <div className="space-y-9">
+    <div className="space-y-8">
       <section>
-        <h2 className="tracking-luxe mb-3 text-[0.62rem] uppercase text-gold-soft">偏爱菜系</h2>
+        <h2 className="mb-3 text-2xl text-ink">最爱的菜系 😋</h2>
         <div className="flex flex-wrap gap-2.5">
           {CUISINE_PRESETS.map((cuisine) => {
             const active = prefs.cuisines.includes(cuisine.value)
@@ -68,11 +68,9 @@ export function PreferencesForm() {
                 key={cuisine.value}
                 type="button"
                 onClick={() => toggleCuisine(cuisine.value)}
-                className={`min-h-10 rounded-full border px-3.5 text-sm transition-colors ${
-                  active
-                    ? 'border-gold bg-gold text-ink'
-                    : 'border-cream/20 text-cream/85 hover:border-gold/60'
-                }`}
+                aria-pressed={active}
+                className="btn-pop min-h-11 px-4 text-lg text-ink"
+                style={{ background: active ? 'var(--color-mint)' : '#fffdf6' }}
               >
                 {cuisine.label}
               </button>
@@ -82,28 +80,28 @@ export function PreferencesForm() {
       </section>
 
       <TagInput
-        label="特别中意"
-        hint="命中会更常被端上桌"
+        label="特别中意 ⭐"
+        hint="命中会更常被转到"
         values={prefs.likes}
         onChange={(values) => update('likes', values)}
         placeholder="例如 茄子 / 牛肉面"
       />
 
       <TagInput
-        label="一概不吃"
+        label="打死不吃 🙅"
         hint="店名或菜系命中即排除"
         values={prefs.dislikes}
         onChange={(values) => update('dislikes', values)}
         placeholder="例如 胡瓜 / 印度餐"
       />
 
-      <label className="flex items-center justify-between border-y border-cream/12 py-4">
-        <span className="text-base text-cream">只看此刻还在营业的</span>
+      <label className="sticker flex items-center justify-between p-4">
+        <span className="text-xl text-ink">只看现在还开着的 🕐</span>
         <input
           type="checkbox"
           checked={prefs.onlyOpenNow}
           onChange={(event) => update('onlyOpenNow', event.target.checked)}
-          className="h-6 w-6 accent-[var(--color-gold)]"
+          className="h-7 w-7 accent-[var(--color-tomato)]"
         />
       </label>
 
@@ -114,7 +112,7 @@ export function PreferencesForm() {
           min={1}
           max={8}
         />
-        <p className="mt-1 text-xs text-taupe/80">「只吃饭」时的默认方圆。</p>
+        <p className="mt-1 text-base text-ink-soft/80">「只吃饭」时的默认方圆。</p>
       </div>
 
       <div className="space-y-3">
@@ -122,13 +120,13 @@ export function PreferencesForm() {
           type="button"
           onClick={save}
           disabled={!loaded || saveState === 'saving'}
-          className="min-h-12 w-full rounded-full bg-gold font-serif text-base font-[600] text-ink
-            transition-[filter] hover:brightness-105 disabled:opacity-60"
+          className="btn-pop min-h-13 w-full px-4 text-2xl text-ink"
+          style={{ background: 'var(--color-sun)' }}
         >
-          {saveState === 'saving' ? '保存中…' : saveState === 'saved' ? '已记下 ✓' : '记住口味'}
+          {saveState === 'saving' ? '保存中…' : saveState === 'saved' ? '记住啦 ✓' : '💾 记住口味'}
         </button>
-        {error && <p className="text-center text-sm text-rose">{error}</p>}
-        <p className="text-center text-xs leading-relaxed text-taupe/80">
+        {error && <p className="text-center text-lg text-tomato">{error}</p>}
+        <p className="text-center text-base leading-relaxed text-ink-soft/80">
           口味两支手机共享。Grab 没有菜单/食材数据，「不吃」按店名或菜系关键词近似排除。
         </p>
       </div>

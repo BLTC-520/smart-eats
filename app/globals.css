@@ -1,34 +1,40 @@
 @import "tailwindcss";
 
-/* 深夜食堂 — warm oxblood ink, candle-gold, cream. Tinted neutrals, no pure black. */
+/* 万选食堂 — crayon / sticker-book look. Bright paper, candy colours,
+   marker outlines, hard offset shadows. Everything a little wonky on purpose. */
 @theme {
-  --color-ink: oklch(0.165 0.028 24);
-  --color-ink-2: oklch(0.215 0.034 22);
-  --color-oxblood: oklch(0.31 0.095 18);
-  --color-gold: oklch(0.82 0.105 84);
-  --color-gold-soft: oklch(0.72 0.085 78);
-  --color-cream: oklch(0.935 0.022 78);
-  --color-taupe: oklch(0.7 0.022 60);
-  --color-rose: oklch(0.66 0.12 22);
+  --color-paper: #fff4d6;
+  --color-paper-2: #ffe9b8;
+  --color-ink: #2f2418;
+  --color-ink-soft: #6b5640;
 
-  --font-display: var(--font-fraunces), Georgia, "Songti SC", serif;
-  --font-serif: var(--font-noto), "Songti SC", "Noto Serif CJK SC", "Songti TC", serif;
+  --color-tomato: #ff5c5c;
+  --color-sun: #ffcb3a;
+  --color-sky: #54a6e8;
+  --color-mint: #57cc8a;
+  --color-grape: #b07be6;
+  --color-tangerine: #ff9a3c;
+  --color-bubble: #ff7fbf;
+
+  --font-hand: var(--font-gaegu), var(--font-kuaile), "Comic Sans MS", "Marker Felt", cursive;
+  --font-display: var(--font-gaegu), var(--font-kuaile), "Comic Sans MS", "Marker Felt", cursive;
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background-color: var(--color-ink);
-  color: var(--color-cream);
-  font-family: var(--font-serif);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-hand);
+  font-weight: 700;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
-/* Candle-lit vignette + faint warm pool of light from the top. */
+/* Sunny paper: a soft warm wash + a faint dotted grid like kid's exercise book. */
 body::before {
   content: "";
   position: fixed;
@@ -36,75 +42,79 @@ body::before {
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(115% 70% at 50% -8%, oklch(0.27 0.06 30) 0%, transparent 55%),
-    radial-gradient(140% 100% at 50% 120%, oklch(0.12 0.02 24) 0%, transparent 60%);
+    radial-gradient(120% 80% at 50% -10%, #fff7e6 0%, transparent 55%),
+    radial-gradient(100% 90% at 50% 115%, #ffe3a8 0%, transparent 60%);
 }
-
-/* Fine film grain so flat dark areas never look like plastic. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.045;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  background-image: radial-gradient(var(--color-paper-2) 1.5px, transparent 1.6px);
+  background-size: 22px 22px;
 }
 
-/* Hairline rule in gold, used as a refined divider. */
-.rule-gold {
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in oklch, var(--color-gold) 60%, transparent) 18%,
-    color-mix(in oklch, var(--color-gold) 60%, transparent) 82%,
-    transparent
-  );
+/* Sticker card: chunky outline + hard drop shadow, like a peel-off sticker. */
+.sticker {
+  border: 3px solid var(--color-ink);
+  border-radius: 1.4rem;
+  box-shadow: 5px 5px 0 var(--color-ink);
+  background: #fffdf6;
 }
 
-.tracking-luxe {
-  letter-spacing: 0.32em;
+/* Chunky pressable button — squishes into its shadow on tap. */
+.btn-pop {
+  border: 3px solid var(--color-ink);
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.btn-pop:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--color-ink);
+}
+.btn-pop:disabled {
+  opacity: 0.55;
 }
 
-/* Staggered entrance: set --d per element for a choreographed page load. */
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+/* Slight hand-drawn tilt helpers. */
+.tilt-l { transform: rotate(-2.5deg); }
+.tilt-r { transform: rotate(2.5deg); }
+
+/* Bouncy entrance for the page load. */
+@keyframes pop-in {
+  0% { opacity: 0; transform: translateY(16px) scale(0.92); }
+  60% { opacity: 1; transform: translateY(-3px) scale(1.02); }
+  100% { opacity: 1; transform: none; }
 }
-.reveal {
-  animation: rise 0.7s var(--d, 0ms) both cubic-bezier(0.16, 1, 0.3, 1);
+.pop {
+  animation: pop-in 0.5s var(--d, 0ms) both cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Slow gold shimmer for the "considering…" state. */
-@keyframes shimmer {
-  0%,
-  100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 1;
-  }
+/* Gentle wiggle for the title / playful accents. */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
 }
-.shimmer {
-  animation: shimmer 1.6s ease-in-out infinite;
+.wiggle { animation: wiggle 2.6s ease-in-out infinite; }
+
+/* Bobbing for the down-pointer / call-to-action. */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
 }
+.bob { animation: bob 1.4s ease-in-out infinite; }
 
 input[type="range"] {
-  accent-color: var(--color-gold);
+  accent-color: var(--color-tomato);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .shimmer {
-    animation: none;
-  }
+  .pop, .wiggle, .bob { animation: none; }
 }
 
 /* Respect device safe areas (notch / home indicator). */

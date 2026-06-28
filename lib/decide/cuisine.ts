@@ -29,6 +29,11 @@ export function isDisliked(restaurant: Restaurant, prefs: Pick<Preferences, 'dis
   return matchesAny(restaurant, prefs.dislikes)
 }
 
+/** True when the restaurant matches any of the chosen cuisine keywords. */
+export function matchesCuisines(restaurant: Restaurant, cuisines: readonly string[]): boolean {
+  return matchesAny(restaurant, cuisines)
+}
+
 /** Selection weight (>= 1); liked places are more likely to be chosen. */
 export function likeWeight(restaurant: Restaurant, prefs: Pick<Preferences, 'likes'>): number {
   return matchesAny(restaurant, prefs.likes) ? LIKE_WEIGHT : BASE_WEIGHT
